@@ -1,7 +1,6 @@
 use std::borrow::ToOwned;
-use std::fmt::Error;
 use tokio::net::UdpSocket;
-use tokio::task::{self, JoinHandle};
+use tokio::task::{self, JoinHandle, AbortHandle};
 use tokio::time::{self, Duration, Interval};
 
 pub struct DriverStation {
@@ -10,7 +9,7 @@ pub struct DriverStation {
     quit: bool,
     count: u16,
     fms_connected: bool,
-    connection: Option<JoinHandle<()>>,
+    connection: Option<AbortHandle>,
 }
 
 impl Default for DriverStation {
@@ -33,21 +32,25 @@ impl DriverStation {
         return ds;
     }
 
-    pub fn init(self) -> Self {
-        tokio::spawn(async {
+    pub fn init(mut self) -> Self {
+        self.socket = UdpSocket::bind(
+
+
+        self.connection = Some(tokio::spawn(async {
             let mut update_rio: Interval = time::interval(Duration::from_millis(20));
+            
 
             loop {
                 DriverStation::ds_to_rio().await;
                 update_rio.tick().await;
             }
-        });
-
-        tokio::spawn(async {
-
-        });
+        }).abort_handle());
 
         return self;
+    }
+    
+    pub fn quit(self) -> () {
+        self.connection.unwrap().abort();
     }
 
     async fn ds_to_rio() {
