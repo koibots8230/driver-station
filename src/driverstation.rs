@@ -1,63 +1,53 @@
 use std::borrow::ToOwned;
 use std::fmt::Error;
 use tokio::net::UdpSocket;
-use tokio::task;
+use tokio::task::{self, JoinHandle};
 use tokio::time::{self, Duration, Interval};
 
-#[non_exhaustive]
-struct Constants;
-
-impl Constants {
-    pub const FMS_IP: String = "10.0.100.5:1160".to_owned();
-    pub const SIM_IP: String = "127.0.0.1".to_owned();
-    pub const FMS_SOCKET: UdpSocket = UdpSocket::bind("10.0.100.5:1145").unwrap();
-    pub const RIO_NORMAL_PORT: &'_ str = ":1110";
-    pub const RIO_FMS_PORT: str = *":1115";
-}
-
 pub struct DriverStation {
+    team_number: u16,
     socket: Option<UdpSocket>,
     quit: bool,
     count: u16,
     fms_connected: bool,
+    connection: Option<JoinHandle<()>>,
 }
 
 impl Default for DriverStation {
     fn default() -> Self {
         Self {
+            team_number: 0,
             socket: None,
             quit: false,
             count: 0,
             fms_connected: false,
+            connection: None,
         }
     }
 }
 
 impl DriverStation {
-    pub fn new(team: u16) -> DriverStation {
-        let mut ds = DriverStation::default();
-        ds.socket = UdpSocket::bind(team_number_to_ip(team) + Constants::RIO_NORMAL_PORT);
+    pub fn new(team: u16) -> Self {
+        let mut ds = Self::default();
+        ds.team_number = team;
         return ds;
     }
 
-    pub fn init() -> () {
+    pub fn init(self) -> Self {
         tokio::spawn(async {
             let mut update_rio: Interval = time::interval(Duration::from_millis(20));
 
-            while !Self.quit {
+            loop {
                 DriverStation::ds_to_rio().await;
                 update_rio.tick().await;
             }
         });
 
         tokio::spawn(async {
-            if Constants::FMS_SOCKET.connect(Constants::FMS_IP).await.is_ok() {
-                Self.fms_connected = true;
-            }
-
-            if Self..connect(Constants::SIM_IP + Constants::RIO_NORMAL_PORT.as_str());
 
         });
+
+        return self;
     }
 
     async fn ds_to_rio() {
