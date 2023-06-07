@@ -1,61 +1,34 @@
-use std::borrow::ToOwned;
-use std::fmt::Error;
-use tokio::net::UdpSocket;
-use tokio::task::{self, JoinHandle};
-use tokio::time::{self, Duration, Interval};
+pub mod state;
+
+use std::{borrow::ToOwned, sync::Arc};
+use bytes::Bytes;
+use local_ip_address::local_ip;
+use tokio::{runtime::{Builder, Runtime}, sync::Mutex, net::UdpSocket};
+
+use self::state::DriverStationState;
+
+type PacketShare = Arc<Mutex<[Bytes; 4]>>;
 
 pub struct DriverStation {
     team_number: u16,
-    socket: Option<UdpSocket>,
-    quit: bool,
-    count: u16,
-    fms_connected: bool,
-    connection: Option<JoinHandle<()>>,
-}
-
-impl Default for DriverStation {
-    fn default() -> Self {
-        Self {
-            team_number: 0,
-            socket: None,
-            quit: false,
-            count: 0,
-            fms_connected: false,
-            connection: None,
-        }
-    }
+    ds: Runtime,
+    udp_socket: UdpSocket,
 }
 
 impl DriverStation {
-    pub fn new(team: u16) -> Self {
-        let mut ds = Self::default();
-        ds.team_number = team;
-        return ds;
+    pub async fn new(team: u16) -> Self {
+        return Self {
+            team_number: team,
+            ds: Builder::new_multi_thread()
+                .worker_threads(2)
+                .thread_name("driver-station")
+                .build()
+                .unwrap(),
+            udp_socket: UdpSocket::bind(local_ip().expect("Failed to retrieve localhost ip").to_string()).await.expect("Error: Failed to bind socket"),        }
     }
 
-    pub fn init(self) -> Self {
-        tokio::spawn(async {
-            let mut update_rio: Interval = time::interval(Duration::from_millis(20));
-
-            loop {
-                DriverStation::ds_to_rio().await;
-                update_rio.tick().await;
-            }
-        });
-
-        tokio::spawn(async {
-
-        });
-
-        return self;
-    }
-
-    async fn ds_to_rio() {
-
-    }
-
-    fn ds_to_fms() {
-
+    pub fn get_rio_udp(self, state: &mut DriverStationState) {
+        self.udp_socket.send_to(buf, target)
     }
 }
 
