@@ -1,30 +1,28 @@
-//! # ds
-//!
-//! `ds` is a library that allows for control of FIRST Robotics Competition robots.
-//! The protocol supported currently is that of the 2018 season, with only the bare minimum
-//! required to control the robot currently consumed. Diagnostic and telemetry information is not decoded and is discarded
-//!
-//! The core trait for use of the crate is the [`DriverStation`](struct.DriverStation.html) crate. This crate
-//! provides an API for connecting and controlling to the roboRIO in an FRC robot. It also allows for users to
-//! provide joystick input using arbitrary APIs, and to consume any incoming TCP packets.
+pub mod driverstation;
 
-#![doc(html_root_url = "https://docs.rs/ds/0.2.1")]
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn one_digit_team_number() {
+        let result = crate::driverstation::team_number_to_ip(8);
+        assert_eq!(result, "10.00.08.2")
+    }
 
-#[macro_use]
-extern crate bitflags;
-#[macro_use]
-extern crate smallvec;
+    #[test]
+    fn two_digit_team_number() {
+        let result = crate::driverstation::team_number_to_ip(82);
+        assert_eq!(result, "10.00.82.2")
+    }
 
-mod outbound;
-mod inbound;
-mod ds;
-pub(crate) mod util;
+    #[test]
+    fn three_digit_team_number() {
+        let result = crate::driverstation::team_number_to_ip(823);
+        assert_eq!(result, "10.08.23.2")
+    }
 
-pub use self::outbound::udp::types::Alliance;
-pub use self::outbound::udp::types::tags::*;
-pub use self::ds::{DriverStation, JoystickValue};
-pub use self::ds::state::Mode;
-pub use self::inbound::tcp::*;
-
-pub type Result<T> = std::result::Result<T, failure::Error>;
-
+    #[test]
+    fn four_digit_team_number() {
+    let result = crate::driverstation::team_number_to_ip(8230);
+    assert_eq!(result, "10.82.30.2")
+    }
+}
