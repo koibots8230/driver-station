@@ -9,7 +9,5 @@ repository = "https://github.com/koibots8230/driver-station-rs"
 documentation = "htttps://docs.rs/driver-station"
 
 [dependencies]
-bytes = "1.4.0"
 local-ip-address = "0.5.3"
 serde = { version = "1.0.163", features = ["derive"] }
-tokio = { version = "1.28.2", features = ["full"] }
