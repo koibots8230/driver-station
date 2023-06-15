@@ -6,7 +6,7 @@ license = "MIT"
 description = "Crate for basic FRC Driver Station functionality"
 readme = "README.md"
 repository = "https://github.com/koibots8230/driver-station-rs"
-documentation = "htttps://docs.rs/driver-station"
+documentation = "https://docs.rs/driver-station"
 
 [dependencies]
 local-ip-address = "0.5.3"
