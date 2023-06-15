@@ -1,8 +1,12 @@
 [package]
-name = "driver-station-rs"
+name = "driver-station"
 version = "0.0.1"
 edition = "2021"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+description = ""
+readme = "README.md"
+repository = "https://github.com/koibots8230/driver-station-rs"
+documentation = "htttps://docs.rs/driver-station"
 
 [dependencies]
 bytes = "1.4.0"
