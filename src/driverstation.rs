@@ -6,7 +6,6 @@ pub fn team_number_to_ip(team_number: u16) -> String {
     let mut tn = team_number.to_string();
     tn = "0".repeat(4 - tn.len()) + &tn;
     return "10.".to_owned() + &tn[0..2] + "." + &tn[2..4] + ".2";
-
 }
 
 macro_rules! from_be_bytes {
@@ -187,14 +186,12 @@ impl FromRioUdpPacket {
                 _ => ()
             };
 
-            for i in 0..tag.size {
+            for _ in 0..tag.size {
                 tags.remove(0);
             }
 
             result.tags.append(&mut vec![tag]);
         }
-
-
 
         return result;
     }
@@ -288,4 +285,3 @@ fn alliance_from_int(num: u8) -> Alliance {
         Alliance::Blue { val:  num % 3 + 1 }
     }
 }
-
